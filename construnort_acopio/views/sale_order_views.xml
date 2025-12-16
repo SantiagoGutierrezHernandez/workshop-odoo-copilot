@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_order_form_inherit_acopio" model="ir.ui.view">
+            <field name="name">sale.order.form.acopio</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <!-- Botón en el header -->
+                <header position="inside">
+                    <button name="action_open_acopio_wizard"
+                            type="object"
+                            string="Acopio"
+                            class="oe_highlight"
+                            groups="construnort_acopio.group_construct_acopio"
+                            attrs="{'invisible': [('state', '=', 'acopio')]}"/>
+                </header>
+                <!-- Agregar estado al statusbar -->
+                <field name="state" position="attributes">
+                    <attribute name="statusbar_add">acopio</attribute>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

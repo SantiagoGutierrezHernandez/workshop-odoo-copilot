@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_construct_acopio" model="res.groups">
+        <field name="name">Acopio - Permiso</field>
+        <field name="category_id" ref="base.module_category_sales_management"/>
+    </record>
+</odoo>
