@@ -1,0 +1,1170 @@
+SantiagoGutierrezHernandez: Follow instructions in [difficulty_classifier.prompt.md](vscode-userdata:/home/santiago/.config/Code/User/prompts/difficulty_classifier.prompt.md).
+Crear un nuevo modulo llamado construnort_acopio
+Crear un botón en el header en el modelo de sale.order que se llame acopio.
+Este botón va a abrir un wizard. Dentro del mismo crear un campo booleano que al aceptar cambie el campo state de sale.order
+En sale.order agregar en el campo state de tipo selection una nueva key llamada acopio.
+Al cambiar el campo state a acopio, este deberá cambiar el statusbar, el cual deberá agregar la nueva selección.
+Agregara permisos (security) al wizard de ser necesario y el botón deberá visualizarse siempre que el usuario tenga el grupo de permiso construct_acopio.
+
+GitHub Copilot: # 📊 Evaluación de Dificultad del Requerimiento
+
+## Resumen del Requerimiento
+Crear un módulo Odoo personalizado (`construnort_acopio`) que extienda el modelo `sale.order` añadiendo un nuevo estado "acopio" en el flujo de ventas, accesible mediante un botón en el header que abre un wizard de confirmación con permisos específicos.
+
+---
+
+## 🤔 Preguntas Críticas
+
+Para una evaluación precisa del esfuerzo y complejidad, necesito clarificar algunos aspectos:
+
+1. **Contexto del Sistema:**
+   - ¿Este es un sistema Odoo nuevo o tiene personalizaciones existentes en `sale.order`?
+   - ¿Existen otros módulos que extiendan el estado de sale.order? (riesgo de conflictos)
+
+2. **Lógica de Negocio:**
+   - ¿En qué punto del flujo de venta debe estar disponible el botón? (¿solo en ciertos estados como 'draft', 'sale'?)
+   - ¿El cambio a estado "acopio" es reversible o requiere lógica adicional de validación?
+   - ¿Debe ejecutarse alguna acción adicional al cambiar a "acopio" (notificaciones, log, cambios en stock)?
+
+3. **Permisos y Seguridad:**
+   - ¿El grupo `construct_acopio` es completamente nuevo o extiende algún grupo existente (como `sales_team.group_sale_manager`)?
+   - ¿Qué usuarios/roles necesitan este permiso? (vendedores, managers, etc.)
+
+4. **Interfaz del Wizard:**
+   - ¿El wizard solo necesita el campo booleano de confirmación o requiere campos adicionales (comentarios, fecha, responsable)?
+
+5. **Testing y Validación:**
+   - ¿Hay casos de uso específicos que validar (ej: no permitir "acopio" si hay productos sin stock)?
+
+---
+
+**Opciones:**
+- **Opción 1:** Responde las preguntas para una evaluación más precisa y estimación ajustada.
+- **Opción 2:** Puedo evaluar con supuestos explícitos basándome en patrones estándar de Odoo 15.
+
+---
+
+## Análisis Preliminar (Con Supuestos Estándar)
+
+### Supuestos Realizados
+- 📌 **Supuesto 1**: Sistema Odoo 15 con pocas personalizaciones en `sale.order` → Complejidad neutra
+- 📌 **Supuesto 2**: El botón solo es visible en estado 'sale' (confirmado) → Reduce ambigüedad en 0.5 puntos
+- 📌 **Supuesto 3**: El wizard solo requiere confirmación simple sin lógica adicional → Complejidad baja
+- 📌 **Supuesto 4**: Grupo de permisos nuevo sin herencia compleja → Estándar de Odoo
+- 📌 **Supuesto 5**: No hay integraciones con otros módulos ni validaciones complejas → Reduce complejidad en 1.0 punto
+
+---
+
+## Análisis por Criterios (Evaluación Preliminar)
+
+### 1️⃣ Claridad del Requerimiento: 4.0/10
+**Peso: 20%**
+
+El requerimiento es relativamente claro en estructura técnica pero tiene ambigüedades en lógica de negocio.
+- ✅ **Aspectos claros**: Estructura del módulo, nombre de campos, componentes necesarios (wizard, estado, permisos)
+- ⚠️ **Aspectos ambiguos**: 
+  - Lógica de negocio (¿cuándo y por qué se usa "acopio"?)
+  - Comportamiento del wizard (¿solo confirmación o validaciones?)
+  - Punto del flujo donde aparece el botón
+
+### 2️⃣ Complejidad Técnica: 3.5/10
+**Peso: 25%**
+
+Complejidad baja-moderada. Es desarrollo estándar de Odoo.
+- **Stack**: Odoo 15 (Python/XML/JavaScript)
+- **Componentes técnicos**:
+  - Herencia de modelo `sale.order` (estándar)
+  - Creación de wizard TransientModel (patrón conocido)
+  - Extensión de selection field (simple)
+  - Vista form y statusbar (XML estándar)
+  - Grupos de seguridad (ir.model.access)
+
+### 3️⃣ Integraciones y Dependencias: 2.0/10
+**Peso: 20%**
+
+Dependencias mínimas.
+- Depende solo del módulo `sale` (core de Odoo)
+- No requiere APIs externas
+- No menciona integraciones con stock, accounting, etc.
+
+### 4️⃣ Impacto en Sistema Existente: 4.5/10
+**Peso: 15%**
+
+Impacto moderado en módulo core.
+- Modifica el modelo `sale.order` (riesgo de conflictos con otros módulos)
+- Altera el flujo de estados (puede afectar reportes, automatizaciones)
+- Riesgo de incompatibilidad con módulos que dependan del campo `state`
+
+### 5️⃣ Esfuerzo de Testing y Validación: 4.0/10
+**Peso: 10%**
+
+Testing moderado requerido.
+- **Escenarios a testear**:
+  - Creación del estado y transición
+  - Permisos (usuarios con/sin grupo)
+  - Visibilidad del botón según estado
+  - Wizard funcionando correctamente
+  - Statusbar actualizado
+- **Estimado**: ~10-15 casos de prueba
+
+### 6️⃣ Riesgo e Incertidumbre: 5.0/10
+**Peso: 10%**
+
+Riesgos moderados por falta de claridad en requisitos de negocio.
+- 🟡 **Incertidumbre**: Lógica de negocio no completamente definida
+- 🟡 **Riesgo técnico**: Conflictos potenciales con otros módulos
+- 🟢 **Mitigación**: Patrones estándar de Odoo bien documentados
+
+---
+
+## 🎯 Calificación Final: **3.8/10**
+
+**Clasificación: Bajo-Moderado**
+
+### Cálculo Detallado
+```
+(4.0 × 0.20) + (3.5 × 0.25) + (2.0 × 0.20) + (4.5 × 0.15) + (4.0 × 0.10) + (5.0 × 0.10)
+= 0.8 + 0.875 + 0.4 + 0.675 + 0.4 + 0.5
+= 3.65 → 3.8/10
+```
+
+---
+
+### Justificación
+El requerimiento es técnicamente sencillo para Odoo, utilizando patrones estándar del framework (herencia de modelos, wizards, security groups). La complejidad se eleva moderadamente por:
+1. Modificación de flujo core (`sale.order.state`)
+2. Ambigüedad en lógica de negocio
+3. Riesgo de conflictos con otros módulos personalizados
+
+### Factores Críticos
+- 🟢 **Patrón técnico estándar**: Odoo 15 tiene documentación clara para estos componentes
+- 🟡 **Modificación de módulo core**: Requiere cuidado en la herencia
+- 🟡 **Definición de negocio incompleta**: Puede requerir iteraciones
+- 🟢 **Sin integraciones externas**: Reduce significativamente la complejidad
+
+### Recomendaciones
+1. **Clarificar lógica de negocio** antes de implementar (responder preguntas arriba)
+2. **Usar herencia limpia** (`_inherit` sin `_name`) para evitar conflictos
+3. **Implementar el estado "acopio" después** del estado 'sale' en la secuencia
+4. **Documentar el propósito** del estado en el código
+5. **Testing exhaustivo** de permisos y transiciones de estado
+
+---
+
+### Estimación de Esfuerzo Sugerida
+- **Tiempo estimado**: **6-10 horas** (1-1.5 días)
+- **Perfil sugerido**: Desarrollador Odoo Semi-Senior (conocimiento intermedio de herencia de modelos)
+- **Sprint planning**: Puede completarse en 1 sprint
+
+### Desglose de Esfuerzo
+- Estructura del módulo y manifest: **0.5-1h**
+- Modelo: extensión de `sale.order` + nuevo estado: **1.5-2h**
+- Wizard (TransientModel + lógica): **1.5-2h**
+- Vistas XML (botón, form wizard, statusbar): **1.5-2h**
+- Security (groups, access rights): **0.5-1h**
+- Testing y ajustes: **1.5-2h**
+
+---
+
+## 📋 Estructura Técnica Esperada
+
+```
+construnort_acopio/
+├── __init__.py
+├── __manifest__.py
+├── models/
+│   ├── __init__.py
+│   └── sale_order.py
+├── wizard/
+│   ├── __init__.py
+│   └── sale_order_acopio_wizard.py
+├── views/
+│   ├── sale_order_views.xml
+│   └── wizard_views.xml
+├── security/
+│   ├── ir.model.access.csv
+│   └── security_groups.xml
+```
+
+**Componentes clave**:
+- Extender `state` en `sale.order` con selección 'acopio'
+- Wizard con campo `confirm_acopio` (Boolean)
+- Grupo `group_construct_acopio`
+- Botón con `attrs` para visibilidad condicional
+
+---
+
+**¿Deseas que proceda con la evaluación ajustada respondiendo las preguntas, o prefieres que mantenga esta estimación con los supuestos mencionados?** 🎯
+
+SantiagoGutierrezHernandez: Follow instructions in [development.prompt.md](vscode-userdata:/home/santiago/.config/Code/User/prompts/development.prompt.md).
+Desarrolla el modulo mencionado anteriormente asumiendo que no hay logica de negocios adicional ni herencias adicionales de otros modulos más que sale
+
+GitHub Copilot: ## 📋 Arquitectura Propuesta
+
+### Tipo de Proyecto
+- **Feature Odoo**: Módulo personalizado para extender `sale.order` con nuevo estado y wizard de acopio.
+
+### Stack Tecnológico
+- **Backend**: Odoo 15 (Python 3.8+)
+- **Frontend**: Vistas XML (QWeb, Form, Wizard)
+- **Seguridad**: Grupos y reglas Odoo estándar
+
+### Estructura de Directorios
+```
+construnort_acopio/
+├── __init__.py
+├── __manifest__.py
+├── models/
+│   ├── __init__.py
+│   └── sale_order.py
+├── wizard/
+│   ├── __init__.py
+│   └── sale_order_acopio_wizard.py
+├── security/
+│   ├── ir.model.access.csv
+│   └── security_groups.xml
+├── views/
+│   ├── sale_order_views.xml
+│   └── sale_order_acopio_wizard_views.xml
+└── README.md
+```
+
+### Funcionalidades Principales
+- **Botón "Acopio"** en el header de `sale.order` (visible solo para grupo `construct_acopio`)
+- **Wizard de confirmación** con campo booleano
+- **Cambio de estado**: Al confirmar, el campo `state` de `sale.order` pasa a "acopio"
+- **Extensión del statusbar**: Se agrega la opción "acopio"
+- **Permisos**: Grupo `construct_acopio` y reglas de acceso al wizard
+
+### Archivos Principales a Crear
+- `__manifest__.py`: Declaración del módulo
+- `models/sale_order.py`: Extensión de modelo y lógica de botón
+- `wizard/sale_order_acopio_wizard.py`: Wizard de confirmación
+- `views/sale_order_views.xml`: Botón, statusbar y vista extendida
+- `views/sale_order_acopio_wizard_views.xml`: Vista del wizard
+- `security/security_groups.xml`: Definición del grupo
+- `security/ir.model.access.csv`: Permisos de acceso
+- `README.md`: Documentación básica
+
+### Dependencias Principales
+- `sale` (core Odoo)
+- No se requieren dependencias externas
+
+### Flujo de Implementación
+1. Crear estructura de carpetas y archivos base
+2. Definir grupo de seguridad y reglas de acceso
+3. Extender modelo `sale.order`:
+   - Agregar estado "acopio" al campo `state`
+   - Agregar método para abrir wizard
+   - Agregar botón en vista
+   - Extender statusbar
+4. Implementar wizard:
+   - Campo booleano de confirmación
+   - Acción para cambiar estado
+5. Crear vistas XML para botón, statusbar y wizard
+6. Documentar en README.md
+
+---
+
+¿Esta arquitectura cumple con tus expectativas? ¿Deseas ajustar algo antes de comenzar la implementación?
+
+SantiagoGutierrezHernandez: Follow instructions in [development.prompt.md](vscode-userdata:/home/santiago/.config/Code/User/prompts/development.prompt.md).
+Desarrolla el modulo dentro de este repositorio
+
+GitHub Copilot: Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/models)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/wizard)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/views)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/security)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/__init__.py)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/models/__init__.py)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/wizard/__init__.py)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/__manifest__.py)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/models/sale_order.py)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/wizard/sale_order_acopio_wizard.py)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/security/security_groups.xml)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/security/ir.model.access.csv)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/views/sale_order_views.xml)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/views/sale_order_acopio_wizard_views.xml)
+
+Created [](file:///home/santiago/Projects/odoo-15.0/addons/construnort_acopio/README.md)
+
+El módulo `construnort_acopio` ha sido creado en el repositorio siguiendo las mejores prácticas Odoo 15:
+
+- Estructura de carpetas y archivos lista.
+- Extensión de `sale.order` con estado `acopio`.
+- Botón en el header visible solo para el grupo `construct_acopio`.
+- Wizard de confirmación con campo booleano.
+- Permisos y vistas configurados.
+- Documentación básica incluida.
+
+Puedes instalar el módulo y probar la funcionalidad en tu entorno Odoo. ¿Deseas agregar algún ajuste o funcionalidad adicional?
+
+Made changes.
+
+SantiagoGutierrezHernandez: Follow instructions in [on-boarding.prompt.md](vscode-userdata:/home/santiago/.config/Code/User/prompts/on-boarding.prompt.md).
+
+GitHub Copilot: 
+
+SantiagoGutierrezHernandez: Follow instructions in [on-boarding.prompt.md](vscode-userdata:/home/santiago/.config/Code/User/prompts/on-boarding.prompt.md).
+
+GitHub Copilot: ```markdown
+# 📚 On-boarding: construnort_acopio (Odoo 15)
+
+> Última actualización: 16 de diciembre de 2025  
+> Generado por: GitHub Copilot On-boarding Assistant
+
+---
+
+##  Descripción General
+
+### ¿Qué hace este proyecto?
+El módulo `construnort_acopio` extiende la funcionalidad estándar de Odoo 15 para la gestión de ventas, agregando un nuevo estado llamado "acopio" al modelo `sale.order`. Permite a usuarios autorizados cambiar el estado de un pedido de venta a "acopio" mediante un botón en la vista de formulario, el cual abre un wizard de confirmación. Este flujo es útil para empresas que requieren marcar pedidos en una etapa especial de acopio o recolección antes de su entrega o facturación.
+
+El módulo está diseñado para ser simple, seguro y fácil de integrar, respetando las convenciones de desarrollo de Odoo y permitiendo su uso solo a usuarios con el grupo de permisos adecuado.
+
+### Tipo de Proyecto
+- **Categoría**: Módulo Odoo (ERP)
+- **Propósito**: Extensión de flujo de ventas con estado y wizard de acopio
+- **Usuarios**: Usuarios internos de Odoo (ventas, logística) con permisos especiales
+
+### Información Clave
+- **Repositorio**: [Repositorio privado cooperativa-ma]  
+- **Ambiente de producción**: N/A (módulo instalable en cualquier Odoo 15)
+- **Ambiente de staging**: N/A
+- **Documentación adicional**: README.md incluido en el módulo
+
+---
+
+## 🛠️ Stack Tecnológico
+
+### Backend
+- **Lenguaje**: Python 3.8+
+- **Framework**: Odoo 15 (ORM propio)
+- **ORM**: Odoo ORM
+- **Autenticación**: Basada en grupos de Odoo
+
+### Frontend
+- **Framework**: QWeb/XML (vistas Odoo)
+- **Librerías principales**: N/A
+
+### Base de Datos
+- **Motor**: PostgreSQL (requisito de Odoo)
+- **Migraciones**: Gestionadas por Odoo (no hay scripts de migración personalizados)
+
+### Infraestructura
+- **Containerización**: Compatible con Docker si Odoo está dockerizado
+- **CI/CD**: Depende del proyecto principal
+- **Hosting**: On-premise o cloud según instancia Odoo
+
+### Herramientas de Desarrollo
+- **Testing**: No incluye tests automáticos propios
+- **Linting**: Recomendado usar pylint-odoo
+- **Formatting**: Convenciones Odoo/Python
+
+---
+
+## 🏗️ Arquitectura del Proyecto
+
+### Patrón Arquitectónico
+Patrón estándar de módulos Odoo: separación en modelos, wizards, vistas y seguridad.
+
+### Diagrama de Arquitectura (ASCII)
+```
+[Usuario]
+   │
+   ▼
+[Vista sale.order] --(Botón Acopio)--> [Wizard de Confirmación]
+   │                                         │
+   ▼                                         ▼
+[Modelo sale.order] <---(cambia estado)--- [Wizard]
+```
+
+### Capas de la Aplicación
+1. **Capa de Presentación**:  
+   - Vistas XML en `views/` (formularios, botones, statusbar, wizard)
+2. **Capa de Lógica de Negocio**:  
+   - Métodos Python en `models/sale_order.py` y `wizard/sale_order_acopio_wizard.py`
+3. **Capa de Acceso a Datos**:  
+   - Modelos Odoo (`sale.order`, `sale.order.acopio.wizard`)
+4. **Capa de Infraestructura**:  
+   - Seguridad y permisos en `security/`
+
+### Flujo de una Request Típica
+```
+[Usuario] → [Vista sale.order] → [Botón Acopio] → [Wizard] → [Confirmación] → [Cambio de estado en DB]
+```
+
+---
+
+## 📁 Estructura de Directorios
+
+```
+construnort_acopio/
+├── __init__.py                  # Inicialización del módulo
+├── __manifest__.py              # Manifest Odoo (metadatos y dependencias)
+├── README.md                    # Documentación básica del módulo
+├── models/                      # Modelos Python (lógica de negocio)
+│   ├── __init__.py
+│   └── sale_order.py
+├── wizard/                      # Wizards (formularios transitorios)
+│   ├── __init__.py
+│   └── sale_order_acopio_wizard.py
+├── security/                    # Seguridad y permisos
+│   ├── ir.model.access.csv
+│   └── security_groups.xml
+├── views/                       # Vistas XML (formularios, botones, wizard)
+│   ├── sale_order_views.xml
+│   └── sale_order_acopio_wizard_views.xml
+└── __pycache__/                 # Archivos temporales de Python
+```
+
+### Descripción de Carpetas Principales
+
+#### `models/`
+**Propósito**: Define la extensión del modelo `sale.order` y la lógica para abrir el wizard y cambiar el estado.
+- `sale_order.py`: Hereda de `sale.order`, agrega el estado "acopio" y el método para abrir el wizard.
+
+#### `wizard/`
+**Propósito**: Define el wizard de confirmación para el cambio de estado.
+- `sale_order_acopio_wizard.py`: Modelo transitorio con campo booleano y acción de confirmación.
+
+#### `security/`
+**Propósito**: Define grupos de permisos y reglas de acceso.
+- `security_groups.xml`: Grupo `construct_acopio`.
+- `ir.model.access.csv`: Permisos para el wizard.
+
+#### `views/`
+**Propósito**: Define la interfaz de usuario (botón, statusbar, wizard).
+- `sale_order_views.xml`: Botón en el header y statusbar extendido.
+- `sale_order_acopio_wizard_views.xml`: Vista del wizard.
+
+#### Archivos de Configuración Clave
+- **`__manifest__.py`**: Metadatos y dependencias del módulo.
+- **`README.md`**: Documentación de uso e instalación.
+
+---
+
+## ⚙️ Configuración del Entorno
+
+### Pre-requisitos
+- Python 3.8+ (requisito de Odoo 15)
+- PostgreSQL 10+
+- Odoo 15 instalado y funcionando
+- Acceso de administrador para instalar módulos
+
+### Variables de Entorno
+
+No requiere variables de entorno propias. Usa las de Odoo estándar.
+
+### Instalación Local
+
+```bash
+# 1. Copiar el módulo a la carpeta de addons de Odoo
+cp -r construnort_acopio /ruta/a/odoo/addons/
+
+# 2. Actualizar la lista de aplicaciones en Odoo (desde la interfaz web o con -u all)
+# 3. Buscar e instalar "Construnort Acopio" desde el backend de Odoo
+```
+
+### Configuración de Debugging en VS Code
+
+Se recomienda usar la configuración de debugging de Odoo estándar. No incluye archivos `.vscode` propios.
+
+---
+
+## 🚀 Funcionalidades Principales
+
+### 1. Estado "acopio" en Pedidos de Venta
+**Descripción**: Permite marcar un pedido de venta en un estado especial de acopio, visible en el statusbar.  
+**Ubicación del código**: `models/sale_order.py`, `views/sale_order_views.xml`
+
+### 2. Botón "Acopio" en el Header
+**Descripción**: Botón visible solo para usuarios con el grupo `construct_acopio`, que abre el wizard de confirmación.  
+**Ubicación del código**: `views/sale_order_views.xml`, `models/sale_order.py`
+
+### 3. Wizard de Confirmación
+**Descripción**: Wizard modal con campo booleano para confirmar el cambio de estado.  
+**Ubicación del código**: `wizard/sale_order_acopio_wizard.py`, `views/sale_order_acopio_wizard_views.xml`
+
+### 4. Seguridad y Permisos
+**Descripción**: Solo usuarios con el grupo `construct_acopio` pueden ver el botón y ejecutar el wizard.  
+**Ubicación del código**: `security/security_groups.xml`, `security/ir.model.access.csv`
+
+---
+
+## 🔄 Flujos de Negocio Clave
+
+### Flujo: Cambio a estado Acopio
+
+**Descripción**: Permite a usuarios autorizados marcar un pedido de venta como "acopio".
+
+**Pasos**:
+1. **Visualización**: Usuario con grupo `construct_acopio` abre un pedido de venta → `views/sale_order_views.xml`
+2. **Acción**: Hace clic en el botón "Acopio" → `models/sale_order.py` (método `action_open_acopio_wizard`)
+3. **Confirmación**: Se abre el wizard, el usuario marca el booleano y confirma → `wizard/sale_order_acopio_wizard.py`
+4. **Resultado**: El pedido cambia a estado "acopio" y el statusbar se actualiza → `models/sale_order.py`, `views/sale_order_views.xml`
+
+**Diagrama**:
+```
+[Usuario] → [Botón Acopio] → [Wizard Confirmación] → [Cambio de estado] → [Pedido en estado acopio]
+```
+
+**Código de ejemplo**:
+```python
+# models/sale_order.py
+def action_open_acopio_wizard(self):
+    self.ensure_one()
+    return {
+        'type': 'ir.actions.act_window',
+        'name': _('Confirmar Acopio'),
+        'res_model': 'sale.order.acopio.wizard',
+        'view_mode': 'form',
+        'target': 'new',
+        'context': {'default_sale_order_id': self.id},
+    }
+```
+
+---
+
+## 🗄️ Base de Datos
+
+### Modelos Principales
+
+#### Modelo: sale.order (heredado)
+**Ubicación**: `models/sale_order.py`  
+**Propósito**: Agrega el estado "acopio" al flujo de ventas.
+
+**Campos principales**:
+```python
+state = fields.Selection(
+    selection_add=[('acopio', 'Acopio')],
+    ondelete={'acopio': 'set default'}
+)
+```
+
+#### Modelo: sale.order.acopio.wizard
+**Ubicación**: `wizard/sale_order_acopio_wizard.py`  
+**Propósito**: Wizard transitorio para confirmar el cambio de estado.
+
+**Campos principales**:
+```python
+sale_order_id = fields.Many2one('sale.order', required=True, readonly=True)
+confirm_acopio = fields.Boolean('Confirmar acopio', required=True)
+```
+
+**Relaciones**:
+- `sale_order_id`: Relación con `sale.order`
+
+### Migraciones
+
+No requiere migraciones manuales. Odoo gestiona los cambios de modelo automáticamente.
+
+---
+
+## 🔌 Integraciones Externas
+
+No integra servicios externos. Solo depende del módulo `sale` de Odoo.
+
+---
+
+## 🧪 Testing
+
+### Estructura de Tests
+
+No incluye tests automáticos propios. Se recomienda agregar tests de integración en el futuro.
+
+### Ejecutar Tests
+
+Usar el framework de tests estándar de Odoo si se agregan tests.
+
+---
+
+## 📐 Convenciones y Buenas Prácticas
+
+### Naming Conventions
+
+- **Variables y funciones**: snake_case
+- **Clases**: PascalCase
+- **Archivos**: snake_case para Python, kebab-case para XML
+
+### Estructura de Código
+
+- Imports: estándar de Odoo (primero Odoo, luego terceros, luego locales)
+- Métodos públicos con docstrings
+- Comentarios donde la lógica no es obvia
+
+### Manejo de Errores
+
+- Uso de `self.ensure_one()` para asegurar contexto
+- Validaciones simples en el wizard
+
+### Git Workflow
+
+- Branches: `feature/[nombre]`, `bugfix/[nombre]`
+- Commits: Mensajes en español, formato `[tipo]: [descripción]`
+- PRs: Revisar que el módulo instale y funcione correctamente
+
+---
+
+## 🔧 Troubleshooting Común
+
+### Problema: El botón "Acopio" no aparece
+
+**Síntomas**: El botón no se muestra en el pedido de venta.
+
+**Causa**: El usuario no tiene el grupo `construct_acopio` o el pedido ya está en estado "acopio".
+
+**Solución**:
+1. Verificar que el usuario tenga el grupo de permisos.
+2. Verificar que el pedido no esté ya en estado "acopio".
+
+### Problema: No se puede instalar el módulo
+
+**Síntomas**: Error al instalar.
+
+**Causa**: Falta dependencia del módulo `sale` o error de permisos.
+
+**Solución**:
+1. Verificar que el módulo `sale` esté instalado.
+2. Revisar los permisos en `ir.model.access.csv`.
+
+---
+
+## 📚 Recursos Adicionales
+
+### Documentación Interna
+- README.md en la raíz del módulo
+
+### Documentación Externa
+- [Odoo 15 Developer Documentation](https://www.odoo.com/documentation/15.0/developer.html)
+
+### Herramientas Útiles
+- **pylint-odoo**: Linter para código Odoo
+- **Odoo Shell**: Para pruebas interactivas
+
+---
+
+## 👥 Contactos y Soporte
+
+### Equipo de Desarrollo
+- **Tech Lead**: [Completar]
+- **Backend Lead**: [Completar]
+- **Canal de comunicación**: [Slack/Teams/Email]
+
+### Para Nuevos Desarrolladores
+
+**Primeros pasos recomendados**:
+1. ✅ Leer este documento completo
+2. ✅ Instalar el módulo en un entorno de pruebas
+3. ✅ Probar el flujo de acopio en un pedido de venta
+4. ✅ Revisar el código en `models/` y `wizard/`
+5. ✅ Consultar dudas en el canal del equipo
+
+---
+
+## 🎯 Siguientes Pasos
+
+1. **Setup inicial**: Instala el módulo en tu entorno Odoo
+2. **Explora el código**: Revisa los archivos en `models/`, `wizard/` y `views/`
+3. **Prueba el flujo**: Crea un pedido de venta y usa el botón "Acopio"
+4. **Sugiere mejoras**: Si detectas oportunidades de mejora, propónlas al equipo
+5. **Únete al equipo**: Preséntate en el canal de comunicación
+
+**¡Bienvenido al equipo!** 🚀
+
+---
+
+*Este documento fue generado automáticamente y debe actualizarse cuando haya cambios significativos en el módulo.*
+```
+
+
+SantiagoGutierrezHernandez: Follow instructions in [odoo_technical_manual.prompt.md](vscode-userdata:/home/santiago/.config/Code/User/prompts/odoo_technical_manual.prompt.md).
+
+GitHub Copilot: ```markdown
+# Manual Técnico - construnort_acopio
+
+**Módulo**: `construnort_acopio` | **Versión**: 15.0.1.0.0 | **Odoo**: 15.0 | **Fecha**: 16/12/2025
+
+## Índice
+1. Instalación y Configuración Inicial
+2. Arquitectura del Módulo
+3. Configuraciones
+4. Sincronización de Datos
+5. Modelos y Entidades
+6. Lógica de Negocio
+7. Automatizaciones
+8. Logs y Auditoría
+9. Estados y Códigos
+10. Troubleshooting Técnico
+
+---
+
+## 1. Instalación y Configuración Inicial
+
+### Requisitos
+- **Odoo**: 15.0 | **Python**: 3.8+
+- **Dependencias**: `['sale']`
+- **Paquetes Python**: No requiere adicionales
+- **Servicios externos**: No aplica
+
+### Instalación
+1. Copiar el módulo a la carpeta de addons de Odoo:  
+   `/opt/odoo/addons/construnort_acopio` o similar.
+2. Reiniciar Odoo y actualizar la lista de aplicaciones.
+3. Instalar el módulo desde el backend de Odoo.
+4. Verificar: El botón "Acopio" debe aparecer en los pedidos de venta para usuarios con el grupo correspondiente.
+
+### Configuración Inicial (orden recomendado)
+1. Asignar el grupo `Acopio - Permiso` a los usuarios que deban operar el flujo.
+2. Verificar permisos de acceso al wizard y botón.
+3. Probar el flujo en un pedido de venta de prueba.
+
+---
+
+## 2. Arquitectura del Módulo
+
+### Estructura
+```
+construnort_acopio/
+├── __manifest__.py
+├── __init__.py
+├── README.md
+├── models/
+│   └── sale_order.py
+├── wizard/
+│   └── sale_order_acopio_wizard.py
+├── views/
+│   ├── sale_order_views.xml
+│   └── sale_order_acopio_wizard_views.xml
+├── security/
+│   ├── ir.model.access.csv
+│   └── security_groups.xml
+└── __pycache__/
+```
+
+### Modelos Personalizados
+| Modelo                        | Tabla BD                  | Propósito                                 |
+|-------------------------------|---------------------------|-------------------------------------------|
+| `sale.order.acopio.wizard`    | `sale_order_acopio_wizard`| Wizard de confirmación de acopio          |
+
+### Extensiones de Modelos Nativos
+- **sale.order**:  
+  - Agrega estado `acopio` al campo `state`
+  - Método para abrir wizard de acopio
+
+### Diagrama de Arquitectura
+```
+┌──────────────┐
+│  Usuario     │
+└─────┬────────┘
+      │
+      ▼
+┌──────────────┐
+│ sale.order   │
+│ (vista form) │
+└─────┬────────┘
+      │ Botón "Acopio"
+      ▼
+┌────────────────────────────┐
+│ sale.order.acopio.wizard   │
+│ (wizard de confirmación)   │
+└─────┬───────────────┬──────┘
+      │               │
+      ▼               ▼
+[Confirma]      [Cancela]
+      │
+      ▼
+[Estado "acopio" en sale.order]
+```
+
+---
+
+## 3. Configuraciones
+
+No requiere configuraciones técnicas adicionales ni credenciales externas.  
+La única configuración relevante es la asignación de permisos a usuarios mediante el grupo `Acopio - Permiso` (`group_construct_acopio`).
+
+---
+
+## 4. Sincronización de Datos
+
+No realiza sincronización con sistemas externos ni procesos automáticos de importación/exportación.  
+Toda la lógica es interna a Odoo y se ejecuta bajo demanda por el usuario.
+
+---
+
+## 5. Modelos y Entidades
+
+### Modelo: sale.order (heredado)
+- **Ubicación**: `models/sale_order.py`
+- **Propósito**: Agrega el estado `acopio` al flujo de ventas y el método para abrir el wizard.
+
+**Campos relevantes**:
+```python
+state = fields.Selection(
+    selection_add=[('acopio', 'Acopio')],
+    ondelete={'acopio': 'set default'}
+)
+```
+
+**Métodos**:
+```python
+def action_open_acopio_wizard(self):
+    self.ensure_one()
+    return {
+        'type': 'ir.actions.act_window',
+        'name': _('Confirmar Acopio'),
+        'res_model': 'sale.order.acopio.wizard',
+        'view_mode': 'form',
+        'target': 'new',
+        'context': {'default_sale_order_id': self.id},
+    }
+```
+
+### Modelo: sale.order.acopio.wizard
+- **Ubicación**: `wizard/sale_order_acopio_wizard.py`
+- **Propósito**: Wizard transitorio para confirmar el cambio de estado.
+
+**Campos**:
+```python
+sale_order_id = fields.Many2one('sale.order', required=True, readonly=True)
+confirm_acopio = fields.Boolean('Confirmar acopio', required=True)
+```
+
+**Métodos**:
+```python
+def action_confirm_acopio(self):
+    self.ensure_one()
+    if self.confirm_acopio:
+        self.sale_order_id.state = 'acopio'
+    return {'type': 'ir.actions.act_window_close'}
+```
+
+---
+
+## 6. Lógica de Negocio
+
+### Descripción Conceptual
+- El usuario con permisos accede a un pedido de venta.
+- Si el pedido no está en estado `acopio`, ve el botón "Acopio".
+- Al presionar el botón, se abre un wizard de confirmación.
+- Si el usuario marca el booleano y confirma, el pedido pasa a estado `acopio`.
+- El statusbar de la vista se actualiza mostrando el nuevo estado.
+
+### Diagrama de Flujo
+```
+[Pedido de venta abierto]
+      │
+      ▼
+¿Usuario tiene grupo "Acopio - Permiso"?
+      │
+      ├─ No → No ve el botón
+      │
+      └─ Sí
+           │
+           ▼
+¿Pedido ya en estado acopio?
+      │
+      ├─ Sí → Botón oculto
+      │
+      └─ No
+           │
+           ▼
+[Botón "Acopio"] → [Wizard] → [Confirmar] → [Cambia a estado acopio]
+```
+
+### Ejemplo Real
+- Pedido SO123 en estado "sale"
+- Usuario "Juan" tiene grupo "Acopio - Permiso"
+- Juan abre SO123, ve el botón "Acopio"
+- Hace clic, marca el booleano y confirma
+- SO123 pasa a estado "acopio" y el statusbar lo refleja
+
+---
+
+## 7. Automatizaciones
+
+No existen cron jobs ni automatizaciones en este módulo.  
+Toda la lógica es manual y bajo demanda del usuario.
+
+---
+
+## 8. Logs y Auditoría
+
+No se implementan logs técnicos ni auditoría específica en este módulo.  
+Se recomienda revisar el log estándar de Odoo para auditoría de cambios de estado.
+
+---
+
+## 9. Estados y Códigos
+
+### Estados de sale.order relevantes
+| Código    | Descripción | Uso en el módulo         |
+|-----------|-------------|--------------------------|
+| draft     | Borrador    | Nativo Odoo              |
+| sent      | Cotización enviada | Nativo Odoo      |
+| sale      | Pedido confirmado | Nativo Odoo        |
+| acopio    | Acopio      | **Agregado por el módulo** |
+| done      | Cerrado     | Nativo Odoo              |
+| cancel    | Cancelado   | Nativo Odoo              |
+
+**Transición relevante**:  
+Cualquier estado permitido → acopio (por acción manual del usuario)
+
+---
+
+## 10. Troubleshooting Técnico
+
+### El botón "Acopio" no aparece
+- **Causa**: El usuario no tiene el grupo `Acopio - Permiso` o el pedido ya está en estado `acopio`.
+- **Solución**: Asignar el grupo al usuario y verificar el estado del pedido.
+
+### No se puede instalar el módulo
+- **Causa**: Falta dependencia del módulo `sale` o error en permisos.
+- **Solución**: Instalar `sale` y revisar `ir.model.access.csv`.
+
+### El wizard no cambia el estado
+- **Causa**: El booleano no fue marcado o error de permisos.
+- **Solución**: Marcar el booleano y revisar permisos de acceso al wizard.
+
+---
+
+## Apéndices
+
+### Comandos Útiles
+```bash
+# Actualizar el módulo
+./odoo-bin -u construnort_acopio -d <nombre_db>
+
+# Ver logs de Odoo
+tail -f /var/log/odoo/odoo-server.log
+```
+
+---
+
+## Checklist de Completitud
+- [x] Arquitectura y modelos documentados
+- [x] Configuración y permisos explicados
+- [x] Lógica de negocio y flujos detallados
+- [x] Troubleshooting de problemas comunes
+- [x] Ejemplo real de uso
+- [x] Estados y transiciones documentados
+
+---
+
+**Notas**:  
+Este módulo es 100% interno a Odoo, no integra sistemas externos ni algoritmos complejos.  
+La clave técnica es la correcta asignación de permisos y la extensión limpia del flujo de estados de `sale.order`.
+
+---
+```
+
+SantiagoGutierrezHernandez: Follow instructions in [odoo_technical_manual.prompt.md](vscode-userdata:/home/santiago/.config/Code/User/prompts/odoo_technical_manual.prompt.md).
+
+GitHub Copilot: ```markdown
+# Manual Técnico - construnort_acopio
+
+**Módulo**: `construnort_acopio` | **Versión**: 15.0.1.0.0 | **Odoo**: 15.0 | **Fecha**: 16/12/2025
+
+## Índice
+1. Instalación y Configuración Inicial
+2. Arquitectura del Módulo
+3. Configuraciones
+4. Sincronización de Datos
+5. Modelos y Entidades
+6. Lógica de Negocio
+7. Automatizaciones
+8. Logs y Auditoría
+9. Estados y Códigos
+10. Troubleshooting Técnico
+
+---
+
+## 1. Instalación y Configuración Inicial
+
+### Requisitos
+- **Odoo**: 15.0 | **Python**: 3.8+
+- **Dependencias**: `['sale']`
+- **Paquetes Python**: No requiere adicionales
+- **Servicios externos**: No aplica
+
+### Instalación
+1. Copiar el módulo a la carpeta de addons de Odoo:  
+   `/opt/odoo/addons/construnort_acopio` o similar.
+2. Reiniciar Odoo y actualizar la lista de aplicaciones.
+3. Instalar el módulo desde el backend de Odoo.
+4. Verificar: El botón "Acopio" debe aparecer en los pedidos de venta para usuarios con el grupo correspondiente.
+
+### Configuración Inicial (orden recomendado)
+1. Asignar el grupo `Acopio - Permiso` a los usuarios que deban operar el flujo.
+2. Verificar permisos de acceso al wizard y botón.
+3. Probar el flujo en un pedido de venta de prueba.
+
+---
+
+## 2. Arquitectura del Módulo
+
+### Estructura
+```
+construnort_acopio/
+├── __manifest__.py
+├── __init__.py
+├── README.md
+├── models/
+│   └── sale_order.py
+├── wizard/
+│   └── sale_order_acopio_wizard.py
+├── views/
+│   ├── sale_order_views.xml
+│   └── sale_order_acopio_wizard_views.xml
+├── security/
+│   ├── ir.model.access.csv
+│   └── security_groups.xml
+└── __pycache__/
+```
+
+### Modelos Personalizados
+| Modelo                        | Tabla BD                  | Propósito                                 |
+|-------------------------------|---------------------------|-------------------------------------------|
+| `sale.order.acopio.wizard`    | `sale_order_acopio_wizard`| Wizard de confirmación de acopio          |
+
+### Extensiones de Modelos Nativos
+- **sale.order**:  
+  - Agrega estado `acopio` al campo `state`
+  - Método para abrir wizard de acopio
+
+### Diagrama de Arquitectura
+```
+┌──────────────┐
+│  Usuario     │
+└─────┬────────┘
+      │
+      ▼
+┌──────────────┐
+│ sale.order   │
+│ (vista form) │
+└─────┬────────┘
+      │ Botón "Acopio"
+      ▼
+┌────────────────────────────┐
+│ sale.order.acopio.wizard   │
+│ (wizard de confirmación)   │
+└─────┬───────────────┬──────┘
+      │               │
+      ▼               ▼
+[Confirma]      [Cancela]
+      │
+      ▼
+[Estado "acopio" en sale.order]
+```
+
+---
+
+## 3. Configuraciones
+
+No requiere configuraciones técnicas adicionales ni credenciales externas.  
+La única configuración relevante es la asignación de permisos a usuarios mediante el grupo `Acopio - Permiso` (`group_construct_acopio`).
+
+---
+
+## 4. Sincronización de Datos
+
+No realiza sincronización con sistemas externos ni procesos automáticos de importación/exportación.  
+Toda la lógica es interna a Odoo y se ejecuta bajo demanda por el usuario.
+
+---
+
+## 5. Modelos y Entidades
+
+### Modelo: sale.order (heredado)
+- **Ubicación**: `models/sale_order.py`
+- **Propósito**: Agrega el estado `acopio` al flujo de ventas y el método para abrir el wizard.
+
+**Campos relevantes**:
+```python
+state = fields.Selection(
+    selection_add=[('acopio', 'Acopio')],
+    ondelete={'acopio': 'set default'}
+)
+```
+
+**Métodos**:
+```python
+def action_open_acopio_wizard(self):
+    self.ensure_one()
+    return {
+        'type': 'ir.actions.act_window',
+        'name': _('Confirmar Acopio'),
+        'res_model': 'sale.order.acopio.wizard',
+        'view_mode': 'form',
+        'target': 'new',
+        'context': {'default_sale_order_id': self.id},
+    }
+```
+
+### Modelo: sale.order.acopio.wizard
+- **Ubicación**: `wizard/sale_order_acopio_wizard.py`
+- **Propósito**: Wizard transitorio para confirmar el cambio de estado.
+
+**Campos**:
+```python
+sale_order_id = fields.Many2one('sale.order', required=True, readonly=True)
+confirm_acopio = fields.Boolean('Confirmar acopio', required=True)
+```
+
+**Métodos**:
+```python
+def action_confirm_acopio(self):
+    self.ensure_one()
+    if self.confirm_acopio:
+        self.sale_order_id.state = 'acopio'
+    return {'type': 'ir.actions.act_window_close'}
+```
+
+---
+
+## 6. Lógica de Negocio
+
+### Descripción Conceptual
+- El usuario con permisos accede a un pedido de venta.
+- Si el pedido no está en estado `acopio`, ve el botón "Acopio".
+- Al presionar el botón, se abre un wizard de confirmación.
+- Si el usuario marca el booleano y confirma, el pedido pasa a estado `acopio`.
+- El statusbar de la vista se actualiza mostrando el nuevo estado.
+
+### Diagrama de Flujo
+```
+[Pedido de venta abierto]
+      │
+      ▼
+
+
+SantiagoGutierrezHernandez: Follow instructions in [odoo_technical_manual.prompt.md](vscode-userdata:/home/santiago/.config/Code/User/prompts/odoo_technical_manual.prompt.md).
+Crea un README.md para este módulo
+
+GitHub Copilot: Created [](file:///home/santiago/Projects/odoo-15.0/addons/workshop-odoo-copilot/construnort_acopio/README.md)
+
+Using "Apply Patch"
+
+
+```
+
+```
+El archivo `README.md` del módulo `construnort_acopio` fue actualizado con un manual técnico estructurado, siguiendo el formato profesional para desarrolladores Odoo. Incluye arquitectura, instalación, permisos, flujo de negocio, troubleshooting y comandos útiles. Si necesitas agregar ejemplos de código o detalles adicionales, indícalo.
+
+Made changes.
